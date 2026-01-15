@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ZURA | HTML Wallpapers</title>
+    <style>
+        :root {
+            --zura-cyan: #00f2ff;
+            --zura-purple: #bc13fe;
+            --bg: #050505;
+        }
+        body {
+            font-family: 'Inter', 'Segoe UI', sans-serif;
+            background: var(--bg);
+            color: white;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+        /* Zura Branding Header */
+        header {
+            margin-top: 50px;
+            text-align: center;
+        }
+        .logo {
+            font-size: 3rem;
+            font-weight: 900;
+            letter-spacing: -2px;
+            background: linear-gradient(to right, var(--zura-cyan), var(--zura-purple));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 10px;
+        }
+        .subtitle {
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 4px;
+            font-size: 0.8rem;
+        }
+
+        #setup-screen {
+            text-align: center;
+            padding: 40px 20px;
+        }
+        .input-group {
+            margin: 30px 0;
+        }
+        input {
+            padding: 15px 25px;
+            font-size: 1.2rem;
+            border-radius: 50px;
+            border: 2px solid #222;
+            background: #111;
+            color: white;
+            outline: none;
+            width: 100%;
+            max-width: 400px;
+            transition: 0.3s;
+            text-align: center;
+        }
+        input:focus {
+            border-color: var(--zura-cyan);
+            box-shadow: 0 0 20px rgba(0, 242, 255, 0.2);
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px;
+            max-width: 1100px;
+            width: 90%;
+            margin-top: 20px;
+        }
+        .card {
+            border: 1px solid #1a1a1a;
+            padding: 15px;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            background: #0d0d0d;
+        }
+        .card:hover {
+            border-color: var(--zura-cyan);
+            transform: scale(1.05);
+            background: #121212;
+        }
+        .preview-box {
+            height: 160px;
+            background: #000;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            overflow: hidden;
+            border-radius: 12px;
+        }
+
+        #output-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: black;
+            display: none;
+            z-index: 1000;
+        }
+        .close-btn {
+            position: fixed;
+            top: 20px; right: 20px;
+            padding: 12px 25px;
+            background: rgba(255,255,255,0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.2);
+            color: white; cursor: pointer;
+            z-index: 1001; border-radius: 50px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="logo">ZURA</div>
+    <div class="subtitle">Engineered for zhnqr</div>
+</header>
+
+<div id="setup-screen">
+    <div class="input-group">
+        <input type="text" id="userName" placeholder="Type your name..." maxlength="15">
+    </div>
+    
+    <div class="grid">
+        <div class="card" onclick="generate('shatter')">
+            <div class="preview-box" style="border: 1px solid #00f2ff; color: #00f2ff;">[ SHATTER ]</div>
+            <strong>Shatter 3D</strong>
+        </div>
+        <div class="card" onclick="generate('neon')">
+            <div class="preview-box" style="background: linear-gradient(45deg, #bc13fe, #00f2ff); color: white;">[ NEON ]</div>
+            <strong>Neon Pulse</strong>
+        </div>
+        <div class="card" onclick="generate('matrix')">
+            <div class="preview-box" style="font-family: monospace; color: #0f0; border: 1px solid #0f0;">[ MATRIX ]</div>
+            <strong>Matrix Rain</strong>
+        </div>
+    </div>
+</div>
+
+<div id="output-overlay">
+    <button class="close-btn" onclick="closePreview()">← Back to Zura</button>
+    <iframe id="preview-frame" style="width:100%; height:100%; border:none;"></iframe>
+</div>
+
+<script>
+/**
+ * ZURA PROTECTED CORE
+ */
+const getWatermarkScript = () => `
+    <div id="zura-license" style="display:none !important;">ZURA_AUTH_STAMP_99</div>
+    <script>
+        (function() {
+            setInterval(() => {
+                const stamp = document.getElementById('zura-license');
+                if(!stamp || stamp.innerText !== 'ZURA_AUTH_STAMP_99') {
+                    document.body.innerHTML = '';
+                    window.location.href = "about:blank";
+                }
+            }, 1000);
+        })();
+    <\/script>
+`;
+
+const templates = {
+    shatter: (name) => `
+        ${getWatermarkScript()}
+        <style>
+            :root { --hue: 200; }
+            body, html { margin: 0; padding: 0; width: 100%; height: 100%; background: #020202; display: flex; justify-content: center; align-items: center; overflow: hidden; perspective: 2000px; font-family: sans-serif; }
+            #bg-glow { position: absolute; width: 100%; height: 100%; background: radial-gradient(circle at center, hsla(var(--hue), 100%, 50%, 0.1) 0%, transparent 70%); pointer-events: none; }
+            .stack { display: grid; transform-style: preserve-3d; cursor: pointer; }
+            .stack span { grid-row-start: 1; grid-column-start: 1; font-size: 15vw; font-weight: 900; color: #fff; transform: translateZ(calc(var(--layer) * 1px)); user-select: none; transition: 0.8s cubic-bezier(0.2, 0.8, 0.2, 1.2); }
+            .stack span:not(:last-child) { color: #222; -webkit-text-stroke: 2px #222; }
+            .stack.active span { transform: translateZ(calc(var(--layer) * 25px)) translateX(calc(var(--tx) * 1px)) translateY(calc(var(--ty) * 1px)) rotateZ(calc(var(--tr) * 1deg)); color: hsla(var(--hue), 80%, 60%, 0.8); }
+        </style>
+        <div id="bg-glow"></div>
+        <div class="stack" id="stack"></div>
+        <script>
+            const stack = document.getElementById('stack');
+            const text = "${name}";
+            for (let i = 0; i < 35; i++) {
+                const span = document.createElement('span');
+                span.textContent = text;
+                span.style.setProperty('--layer', -i);
+                span.style.setProperty('--tx', (Math.random() - 0.5) * 500);
+                span.style.setProperty('--ty', (Math.random() - 0.5) * 500);
+                span.style.setProperty('--tr', (Math.random() - 0.5) * 100);
+                stack.appendChild(span);
+            }
+            document.addEventListener('mousedown', () => {
+                stack.classList.add('active');
+                setTimeout(() => stack.classList.remove('active'), 1000);
+            });
+        <\/script>
+    `,
+    neon: (name) => `
+        ${getWatermarkScript()}
+        <style>
+            body { background: #050505; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; font-family: sans-serif; }
+            h1 { font-size: 12vw; color: #fff; text-transform: uppercase; animation: pulse 2s infinite alternate; }
+            @keyframes pulse { 
+                from { text-shadow: 0 0 10px #fff, 0 0 20px #00f2ff, 0 0 40px #00f2ff; opacity: 0.8; }
+                to { text-shadow: 0 0 20px #fff, 0 0 40px #bc13fe, 0 0 80px #bc13fe; opacity: 1; }
+            }
+        </style>
+        <h1>${name}</h1>
+    `,
+    matrix: (name) => `
+        ${getWatermarkScript()}
+        <style>
+            body { background: black; margin: 0; overflow: hidden; display: flex; justify-content: center; align-items: center; height: 100vh; font-family: monospace; }
+            canvas { position: absolute; top: 0; left: 0; }
+            h1 { position: relative; color: #0f0; font-size: 10vw; text-shadow: 0 0 15px #0f0; z-index: 10; letter-spacing: 5px; }
+        </style>
+        <canvas id="m"></canvas>
+        <h1>${name}</h1>
+        <script>
+            const c = document.getElementById("m");
+            const ctx = c.getContext("2d");
+            c.height = window.innerHeight; c.width = window.innerWidth;
+            const letters = "ZURA01";
+            const fontSize = 18;
+            const columns = c.width / fontSize;
+            const drops = Array(Math.floor(columns)).fill(1);
+            function draw() {
+                ctx.fillStyle = "rgba(0, 0, 0, 0.05)";
+                ctx.fillRect(0, 0, c.width, c.height);
+                ctx.fillStyle = "#0F0";
+                ctx.font = fontSize + "px monospace";
+                drops.forEach((y, i) => {
+                    const text = letters[Math.floor(Math.random() * letters.length)];
+                    ctx.fillText(text, i * fontSize, y * fontSize);
+                    if (y * fontSize > c.height && Math.random() > 0.975) drops[i] = 0;
+                    drops[i]++;
+                });
+            }
+            setInterval(draw, 35);
+        <\/script>
+    `
+};
+
+function generate(style) {
+    const name = document.getElementById('userName').value || "ZURA USER";
+    const overlay = document.getElementById('output-overlay');
+    const frame = document.getElementById('preview-frame');
+    frame.srcdoc = templates[style](name);
+    overlay.style.display = 'block';
+}
+
+function closePreview() {
+    document.getElementById('output-overlay').style.display = 'none';
+}
+</script>
+</body>
+</html>
