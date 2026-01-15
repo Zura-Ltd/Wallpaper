@@ -7,175 +7,186 @@
         body {
             background: #000;
             color: #fff;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            font-family: monospace;
             margin: 0;
             display: flex;
-            flex-direction: column;
             align-items: center;
             justify-content: center;
             height: 100vh;
             overflow: hidden;
         }
 
-        .container { text-align: center; width: 100%; max-width: 600px; }
+        .ui-container { text-align: center; z-index: 10; }
 
         h1 {
-            font-size: 0.8rem;
-            letter-spacing: 0.5rem;
-            color: #444;
-            margin-bottom: 40px;
-            text-transform: uppercase;
+            font-size: 1rem;
+            letter-spacing: 0.8rem;
+            color: #333;
+            margin-bottom: 50px;
         }
 
         input {
             background: transparent;
             border: none;
-            border-bottom: 1px solid #222;
+            border-bottom: 2px solid #111;
             color: #fff;
-            font-size: 2rem;
+            font-size: 2.5rem;
             text-align: center;
-            padding: 10px;
-            width: 80%;
+            width: 100%;
             outline: none;
-            transition: border-color 0.4s;
-            margin-bottom: 50px;
-        }
-
-        input:focus { border-color: #fff; }
-
-        .selector {
-            display: flex;
-            gap: 40px;
-            justify-content: center;
-        }
-
-        .opt {
-            cursor: pointer;
-            font-size: 0.7rem;
-            letter-spacing: 0.2rem;
-            color: #555;
+            transition: 0.5s;
             text-transform: uppercase;
-            transition: 0.3s;
-            padding: 10px;
         }
 
-        .opt:hover { color: #fff; }
+        input:focus { border-bottom: 2px solid #fff; }
 
-        /* Preview Overlay */
-        #view {
+        .generate-trigger {
+            margin-top: 40px;
+            cursor: pointer;
+            color: #555;
+            letter-spacing: 0.2rem;
+            transition: 0.3s;
+        }
+
+        .generate-trigger:hover { color: #00f2ff; }
+
+        /* Fullscreen Preview */
+        #wallpaper-overlay {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
             background: #000;
             display: none;
-            z-index: 100;
+            z-index: 1000;
         }
 
         .controls {
             position: absolute;
-            bottom: 30px;
+            bottom: 40px;
             left: 50%;
             transform: translateX(-50%);
             display: flex;
             gap: 20px;
-            z-index: 110;
+            z-index: 2000;
         }
 
         .btn {
-            background: rgba(255,255,255,0.1);
-            backdrop-filter: blur(10px);
+            background: rgba(255,255,255,0.05);
             border: 1px solid rgba(255,255,255,0.1);
             color: #fff;
-            padding: 12px 25px;
-            border-radius: 5px;
+            padding: 10px 20px;
             cursor: pointer;
-            font-size: 0.7rem;
-            text-transform: uppercase;
-            letter-spacing: 0.1rem;
+            font-family: monospace;
+            font-size: 0.8rem;
         }
 
         .btn:hover { background: #fff; color: #000; }
-        
+
         iframe { width: 100%; height: 100%; border: none; }
     </style>
 </head>
 <body>
 
-    <div class="container">
-        <h1>ZURA / ENGINE</h1>
-        <input type="text" id="name" placeholder="ENTER NAME" autocomplete="off">
-        <div class="selector">
-            <div class="opt" onclick="build('shatter')">01. Shatter</div>
-            <div class="opt" onclick="build('neon')">02. Neon</div>
-            <div class="opt" onclick="build('matrix')">03. Matrix</div>
-        </div>
+    <div class="ui-container">
+        <h1>ZURA</h1>
+        <input type="text" id="userInput" placeholder="NAME" spellcheck="false">
+        <div class="generate-trigger" onclick="launch()">[ INITIALIZE ENGINE ]</div>
     </div>
 
-    <div id="view">
+    <div id="wallpaper-overlay">
         <div class="controls">
-            <button class="btn" onclick="dl()">Download for Lively</button>
-            <button class="btn" style="background:transparent;" onclick="closeV()">Exit</button>
+            <button class="btn" onclick="downloadHTML()">SAVE .HTML</button>
+            <button class="btn" onclick="closeOverlay()">EXIT</button>
         </div>
-        <iframe id="frame"></iframe>
+        <iframe id="engine-frame"></iframe>
     </div>
 
 <script>
-    let currentHTML = "";
-    let currentName = "";
+    let finalCode = "";
 
-    const getWM = () => `
-        <div id="z-auth" style="display:none!important">ZURA_99</div>
-        <script>
-            setInterval(()=>{
-                if(!document.getElementById('z-auth')||document.getElementById('z-auth').innerText!=='ZURA_99'){
-                    document.body.innerHTML='';window.location.href='about:blank';
-                }
-            },500);
-        <\/script>
-    `;
+    function launch() {
+        const name = document.getElementById('userInput').value || "ZURA";
+        
+        // This is your original perfect code wrapped in a template literal
+        finalCode = `
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <style>
+        :root { --text-color: #ffffff; --depth-color: #222; --hue: 200; }
+        body, html { margin: 0; padding: 0; width: 100%; height: 100%; background: #020202; display: flex; justify-content: center; align-items: center; overflow: hidden; perspective: 2000px; }
+        #bg-glow { position: absolute; width: 100%; height: 100%; background: radial-gradient(circle at center, hsla(var(--hue), 100%, 50%, 0.15) 0%, transparent 70%); pointer-events: none; transition: background 0.3s ease; }
+        .stack { display: grid; grid-template-columns: 1fr; transform-style: preserve-3d; transition: transform 0.1s ease-out; cursor: pointer; animation: breathe 4s ease-in-out infinite; }
+        @keyframes breathe { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } }
+        .stack span { grid-row-start: 1; grid-column-start: 1; font-size: 15vw; font-weight: 900; color: var(--text-color); transform: translateZ(calc(var(--layer) * 1px)); user-select: none; transition: transform 0.8s cubic-bezier(0.2, 0.8, 0.2, 1.2), color 0.4s; font-family: sans-serif; }
+        .stack span:not(:last-child) { color: var(--depth-color); -webkit-text-stroke: 2px var(--depth-color); }
+        .stack span:last-child { color: #fff; text-shadow: 0 0 20px rgba(255,255,255,0.2); }
+        .stack.active span { transform: translateZ(calc(var(--layer) * 20px)) translateX(calc(var(--tx) * 1px)) translateY(calc(var(--ty) * 1px)) rotateZ(calc(var(--tr) * 1deg)); color: hsla(var(--hue), 80%, 60%, 0.8); -webkit-text-stroke: 1px hsla(var(--hue), 80%, 60%, 1); }
+        #wm-check { display: none !important; }
+    </style>
+</head>
+<body>
+    <div id="wm-check">ZURA_AUTH</div>
+    <div id="bg-glow"></div>
+    <div class="stack" id="stack"></div>
 
-    const styles = {
-        shatter: (n) => `
-            ${getWM()}
-            <style>
-                body { margin:0; background:#020202; height:100vh; display:flex; justify-content:center; align-items:center; overflow:hidden; perspective:2000px; font-family:sans-serif; }
-                .s { display:grid; transform-style:preserve-3d; }
-                .s span { grid-area:1/1; font-size:15vw; font-weight:900; color:#fff; transform:translateZ(calc(var(--l) * -1px)); transition:0.8s cubic-bezier(0.2,0.8,0.2,1.2); user-select:none; }
-                .s span:not(:last-child) { color:#111; -webkit-text-stroke:2px #111; }
-                .s:active span { transform:translateZ(calc(var(--l) * -20px)) translateX(calc(var(--x) * 1px)) translateY(calc(var(--y) * 1px)) rotate(calc(var(--r) * 1deg)); color:cyan; }
-            </style>
-            <div class="s" id="st"></div>
-            <script>
-                const st = document.getElementById('st');
-                for(let i=0;i<30;i++){
-                    const s = document.createElement('span');
-                    s.textContent = "${n}";
-                    s.style.setProperty('--l', i);
-                    s.style.setProperty('--x', (Math.random()-0.5)*400);
-                    s.style.setProperty('--y', (Math.random()-0.5)*400);
-                    s.style.setProperty('--r', (Math.random()-0.5)*60);
-                    st.appendChild(s);
-                }
-                document.addEventListener('mousedown',()=>st.classList.add('active'));
-                document.addEventListener('mouseup',()=>st.classList.remove('active'));
-            <\/script>
-        `
-        // Add other styles here similarly...
-    };
+    <script>
+        // Anti-Tamper Watermark Logic
+        setInterval(() => {
+            const wm = document.getElementById('wm-check');
+            if(!wm || wm.innerText !== 'ZURA_AUTH') { document.body.innerHTML = ''; window.location.href = 'about:blank'; }
+        }, 1000);
 
-    function build(s) {
-        currentName = document.getElementById('name').value || "ZURA";
-        currentHTML = `<!DOCTYPE html><html>${styles[s](currentName)}</html>`;
-        document.getElementById('frame').srcdoc = currentHTML;
-        document.getElementById('view').style.display = 'block';
+        const stack = document.getElementById('stack');
+        const glow = document.getElementById('bg-glow');
+        const text = "${name}";
+        const layerCount = 35;
+        let currentHue = 200;
+
+        for (let i = 0; i < layerCount; i++) {
+            const span = document.createElement('span');
+            span.textContent = text;
+            span.style.setProperty('--layer', -i);
+            span.style.setProperty('--tx', (Math.random() - 0.5) * 400);
+            span.style.setProperty('--ty', (Math.random() - 0.5) * 400);
+            span.style.setProperty('--tr', (Math.random() - 0.5) * 90);
+            stack.appendChild(span);
+        }
+
+        document.addEventListener('mousemove', (e) => {
+            const x = (window.innerWidth / 2 - e.pageX) / 12;
+            const y = (window.innerHeight / 2 - e.pageY) / 12;
+            stack.style.transform = "rotateY(" + (-x) + "deg) rotateX(" + y + "deg)";
+            const pctX = (e.pageX / window.innerWidth) * 100;
+            const pctY = (e.pageY / window.innerHeight) * 100;
+            glow.style.background = "radial-gradient(circle at " + pctX + "% " + pctY + "%, hsla(" + currentHue + ", 100%, 50%, 0.2) 0%, transparent 70%)";
+        });
+
+        function trigger() {
+            currentHue = (currentHue + 60) % 360;
+            document.documentElement.style.setProperty('--hue', currentHue);
+            stack.classList.add('active');
+            setTimeout(() => { stack.classList.remove('active'); }, 800);
+        }
+        stack.addEventListener('mousedown', trigger);
+    <\/script>
+</body>
+</html>`;
+
+        document.getElementById('engine-frame').srcdoc = finalCode;
+        document.getElementById('wallpaper-overlay').style.display = 'block';
     }
 
-    function closeV() { document.getElementById('view').style.display = 'none'; }
+    function closeOverlay() {
+        document.getElementById('wallpaper-overlay').style.display = 'none';
+    }
 
-    function dl() {
-        const blob = new Blob([currentHTML], {type: 'text/html'});
+    function downloadHTML() {
+        const name = document.getElementById('userInput').value || "ZURA";
+        const blob = new Blob([finalCode], {type: 'text/html'});
         const a = document.createElement('a');
         a.href = URL.createObjectURL(blob);
-        a.download = \`Zura_\${currentName}.html\`;
+        a.download = `Zura_${name}.html`;
         a.click();
     }
 </script>
